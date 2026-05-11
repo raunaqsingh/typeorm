@@ -1642,6 +1642,16 @@ export class PostgresQueryRunner
                         }" TYPE ${this.driver.createFullType(oldColumn)}`,
                     ),
                 )
+                                const alteredColumn = clonedTable.columns.find(
+                    (column) => column.name === newColumn.name,
+                )
+                if (alteredColumn) {
+                    alteredColumn.type = newColumn.type
+                    alteredColumn.length = newColumn.length
+                    alteredColumn.precision = newColumn.precision
+                    alteredColumn.scale = newColumn.scale
+                    alteredColumn.isArray = newColumn.isArray
+                }
             }
 
             if (
@@ -2354,7 +2364,7 @@ export class PostgresQueryRunner
                     new Query(
                         `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${
                             newColumn.name
-                        }" TYPE ${newColumn.type} COLLATE "${
+                        }"  "${
                             newColumn.collation
                         }"`,
                     ),
@@ -2368,7 +2378,7 @@ export class PostgresQueryRunner
                     new Query(
                         `ALTER TABLE ${this.escapePath(table)} ALTER COLUMN "${
                             newColumn.name
-                        }" TYPE ${newColumn.type} COLLATE ${oldCollation}`,
+                        }"  ${oldCollation}`,
                     ),
                 )
             }
